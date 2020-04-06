@@ -8,3 +8,6 @@ class Car(models.Model):
     year = models.IntegerField()
     color = models.CharField(max_length=100)
     description = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.model
