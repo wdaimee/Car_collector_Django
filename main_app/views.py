@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Car
+from .forms import MaintenanceForm
 # Create your views here.
 
 def home(request):
@@ -16,7 +17,8 @@ def car_index(request):
 
 def car_detail(request, car_id):
     car = Car.objects.get(id=car_id)
-    return render(request, 'cars/detail.html', {'car': car})
+    maintenance_form = MaintenanceForm()
+    return render(request, 'cars/detail.html', {'car': car, 'maintenance_form': maintenance_form})
 
 class CarCreate(CreateView):
     model = Car
@@ -30,4 +32,14 @@ class CarUpdate(UpdateView):
 class CarDelete(DeleteView):
     model = Car
     success_url = '/cars/'
+
+def add_maint(request, car_id):
+    form = MaintenanceForm(request.POST)
+    if form.is_valid():
+        new_maint = form.save(commit=False)
+        new_maint.car_id = car_id
+        new_maint.save()
+    return redirect('detail', car_id=car_id)
+
+
 

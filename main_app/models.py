@@ -23,7 +23,7 @@ class Car(models.Model):
         return reverse('detail', kwargs={'car_id': self.id})
 
 class Maintenance(models.Model):
-    date = models.DateField()
+    date = models.DateField('Maintenance Date')
     maint_type = models.CharField(
         max_length=1,
         choices=MAINT_TYPES,
@@ -34,3 +34,6 @@ class Maintenance(models.Model):
     
     def __str__(self):
         return f"{self.get_maint_type_display()} on {self.date}"
+
+    class Meta:
+        ordering = ['-date']
