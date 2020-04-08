@@ -63,7 +63,8 @@ class PartDelete(DeleteView):
     model = Part
     success_url = '/parts/'
 
-
-
+def assoc_part(request, car_id, part_id):
+  Car.objects.get(id=car_id).parts.add(part_id)
+  return redirect('detail', car_id=car_id)
 
 
