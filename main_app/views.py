@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Car
+from django.views.generic import ListView, DetailView
+from .models import *
 from .forms import MaintenanceForm
 # Create your views here.
 
@@ -40,6 +41,26 @@ def add_maint(request, car_id):
         new_maint.car_id = car_id
         new_maint.save()
     return redirect('detail', car_id=car_id)
+
+class PartList(ListView):
+    model = Part
+
+class PartDetail(DetailView):
+    model = Part
+
+class PartCreate(CreateView):
+    model = Part
+    fields = '__all__'
+
+class PartUpdate(UpdateView):
+    model = Part
+    fields = '__all__'
+
+class PartDelete(DeleteView):
+    model = Part
+    success_url = '/parts/'
+
+
 
 
 
