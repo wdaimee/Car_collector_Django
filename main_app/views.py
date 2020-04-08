@@ -18,8 +18,11 @@ def car_index(request):
 
 def car_detail(request, car_id):
     car = Car.objects.get(id=car_id)
+    parts_car_doesnt_have = Part.objects.exclude(id__in = car.parts.all().values_list('id'))
     maintenance_form = MaintenanceForm()
-    return render(request, 'cars/detail.html', {'car': car, 'maintenance_form': maintenance_form})
+    return render(request, 'cars/detail.html', 
+    {'car': car, 'maintenance_form': maintenance_form, 'parts': parts_car_doesnt_have}
+    )
 
 class CarCreate(CreateView):
     model = Car

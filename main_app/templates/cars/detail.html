@@ -59,7 +59,29 @@
       <h5>No Parts :(</h5>
     {% endif %}
   </div>
-  <!-- Available Parts will come after this line -->
+  <div class="col s6">
+    <h3>Available Parts</h3>
+    {% if parts.count %}
+      {% for part in parts.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              {{ part.name }} <br />
+              {{ part.sub_type }}
+            </span>
+          </div>
+          <div class="card-action">
+            <form action="" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn">Add</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>{{car.model}} Already Has All Parts Available</h5>
+    {% endif %}
+  </div>
 </div>
   <script>
      var dateEl = document.getElementById('id_date');
