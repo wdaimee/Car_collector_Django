@@ -33,8 +33,7 @@ def car_detail(request, car_id):
 
 class CarCreate(CreateView):
     model = Car
-    fields = '__all__'
-    success_url = '/cats/'
+    fields = ['make', 'model', 'year', 'color', 'description']
 
     def form_valid(self, form):
         form.instance.user = self.request.user
