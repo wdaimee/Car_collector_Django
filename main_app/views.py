@@ -20,7 +20,7 @@ def about(request):
     return render(request, 'about.html')
 
 def car_index(request):
-    cars = Car.objects.all()
+    cars = Car.objects.filter(user=request.user)
     return render(request, 'cars/index.html', {'cars': cars})
 
 def car_detail(request, car_id):
