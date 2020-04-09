@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 import uuid
 import boto3
 from .models import *
@@ -33,6 +35,11 @@ class CarCreate(CreateView):
     model = Car
     fields = '__all__'
     success_url = '/cats/'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
 
 class CarUpdate(UpdateView):
     model = Car
@@ -86,3 +93,18 @@ def add_photo(request, car_id):
             print(e)
             print('An error occurred uploading file to s3')
     return redirect('detail', car_id=car_id)
+
+def signup(request):
+    error_message = ''
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST) # create a form with all the request data
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('index')
+        else:
+            error_message = 'Invalid sign up - try again'
+    form = UserCreationForm() #if the form is not valid, empty the contents of the form
+    context = {'form': form, 'error_message': error_message} # initialize contex
+    return render(request, 'registration/signup.html', context) # return the user to the registration page
+
