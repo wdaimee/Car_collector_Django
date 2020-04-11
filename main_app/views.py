@@ -4,6 +4,8 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 import uuid
 import boto3
 from .models import *
@@ -14,15 +16,17 @@ S3_BASE_URL = 'https://s3.ca-central-1.amazonaws.com/'
 BUCKET = 'carcollector123'
 
 def home(request):
-    return HttpResponse('<h1>Hello Cars!</h1>')
+    return render(request, 'index.html')
 
 def about(request):
     return render(request, 'about.html')
 
+@login_required
 def car_index(request):
     cars = Car.objects.filter(user=request.user)
     return render(request, 'cars/index.html', {'cars': cars})
 
+@login_required
 def car_detail(request, car_id):
     car = Car.objects.get(id=car_id)
     parts_car_doesnt_have = Part.objects.exclude(id__in = car.parts.all().values_list('id'))
@@ -31,7 +35,7 @@ def car_detail(request, car_id):
     {'car': car, 'maintenance_form': maintenance_form, 'parts': parts_car_doesnt_have}
     )
 
-class CarCreate(CreateView):
+class CarCreate(LoginRequiredMixin, CreateView):
     model = Car
     fields = ['make', 'model', 'year', 'color', 'description']
 
@@ -40,14 +44,15 @@ class CarCreate(CreateView):
         return super().form_valid(form)
 
 
-class CarUpdate(UpdateView):
+class CarUpdate(LoginRequiredMixin, UpdateView):
     model = Car
     fields = '__all__'
 
-class CarDelete(DeleteView):
+class CarDelete(LoginRequiredMixin, DeleteView):
     model = Car
     success_url = '/cars/'
 
+@login_required
 def add_maint(request, car_id):
     form = MaintenanceForm(request.POST)
     if form.is_valid():
@@ -56,28 +61,30 @@ def add_maint(request, car_id):
         new_maint.save()
     return redirect('detail', car_id=car_id)
 
-class PartList(ListView):
+class PartList(LoginRequiredMixin, ListView):
     model = Part
 
-class PartDetail(DetailView):
+class PartDetail(LoginRequiredMixin, DetailView):
     model = Part
 
-class PartCreate(CreateView):
-    model = Part
-    fields = '__all__'
-
-class PartUpdate(UpdateView):
+class PartCreate(LoginRequiredMixin, CreateView):
     model = Part
     fields = '__all__'
 
-class PartDelete(DeleteView):
+class PartUpdate(LoginRequiredMixin, UpdateView):
+    model = Part
+    fields = '__all__'
+
+class PartDelete(LoginRequiredMixin, DeleteView):
     model = Part
     success_url = '/parts/'
 
+@login_required
 def assoc_part(request, car_id, part_id):
   Car.objects.get(id=car_id).parts.add(part_id)
   return redirect('detail', car_id=car_id)
 
+@login_required
 def add_photo(request, car_id):
     photo_file = request.FILES.get('photo-file', None)
     if photo_file:
